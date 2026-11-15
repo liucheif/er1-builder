@@ -375,6 +375,16 @@ run_container_build() {
         bash wrt_core/build_container.sh "$Dev" "$container_build_mod"
 }
 
+inject_airprint_service() {
+    local target="$BASE_PATH/../$BUILD_DIR/package/base-files/files/etc/avahi/services"
+    local src="$BASE_PATH/wrt_core/assets/printer.service"
+    if [ -f "$src" ]; then
+        mkdir -p "$target" || return 0
+        cp -f "$src" "$target/printer.service" && \
+            echo "已注入 AirPrint 广播文件：/etc/avahi/services/printer.service"
+    fi
+}
+
 remove_uhttpd_dependency() {
     local config_path="$BASE_PATH/../$BUILD_DIR/.config"
     local luci_makefile_path="$BASE_PATH/../$BUILD_DIR/feeds/luci/collections/luci/Makefile"
@@ -435,6 +445,7 @@ fi
 apply_config
 print_config_fragment_summary
 remove_uhttpd_dependency
+inject_airprint_service
 
 cd "$BASE_PATH/../$BUILD_DIR"
 make defconfig
