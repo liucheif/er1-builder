@@ -385,6 +385,16 @@ inject_airprint_service() {
     fi
 }
 
+patch_rust_llvm() {
+    local mk="$BASE_PATH/../$BUILD_DIR/feeds/packages/lang/rust/Makefile"
+    if [ -f "$mk" ] && grep -q "llvm.download-ci-llvm=true" "$mk"; then
+        sed -i 's/llvm\.download-ci-llvm=true/llvm.download-ci-llvm=false/' "$mk"
+        echo "已打补丁：rust bootstrap 改为源码编译 LLVM（绕开 ci-artifacts 404）"
+    else
+        echo "rust LLVM 补丁未应用（文件不存在或已是 false）"
+    fi
+}
+
 remove_uhttpd_dependency() {
     local config_path="$BASE_PATH/../$BUILD_DIR/.config"
     local luci_makefile_path="$BASE_PATH/../$BUILD_DIR/feeds/luci/collections/luci/Makefile"
@@ -446,6 +456,7 @@ apply_config
 print_config_fragment_summary
 remove_uhttpd_dependency
 inject_airprint_service
+patch_rust_llvm
 
 cd "$BASE_PATH/../$BUILD_DIR"
 make defconfig
