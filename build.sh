@@ -385,6 +385,22 @@ inject_airprint_service() {
     fi
 }
 
+inject_argon_default_theme() {
+    # 固件内置 Argon 主题后，让首次开机就用 Argon，免去手动切换
+    local dir="$BASE_PATH/../$BUILD_DIR/package/base-files/files/etc/uci-defaults"
+    local f="$dir/99-argon-default-theme"
+    mkdir -p "$dir" || return 0
+    cat >"$f" <<'EOF'
+#!/bin/sh
+# 首次开机设置默认界面主题为 Argon
+[ -d /www/luci-static/argon ] || exit 0
+uci -q set luci.main.mediaurlbase='/luci-static/argon'
+uci -q commit luci
+exit 0
+EOF
+    chmod +x "$f" && echo "已注入默认主题脚本：/etc/uci-defaults/99-argon-default-theme"
+}
+
 patch_rust_llvm() {
     local mk="$BASE_PATH/../$BUILD_DIR/feeds/packages/lang/rust/Makefile"
     if [ -f "$mk" ] && grep -q "llvm.download-ci-llvm=true" "$mk"; then
@@ -456,6 +472,7 @@ apply_config
 print_config_fragment_summary
 remove_uhttpd_dependency
 inject_airprint_service
+inject_argon_default_theme
 patch_rust_llvm
 
 cd "$BASE_PATH/../$BUILD_DIR"
