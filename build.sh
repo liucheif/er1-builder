@@ -386,19 +386,19 @@ inject_airprint_service() {
 }
 
 inject_argon_default_theme() {
-    # 固件内置 Argon 主题后，让首次开机就用 Argon，免去手动切换
+    # 固件内置 Vantage 主题后，让首次开机就用 Vantage，免去手动切换
     local dir="$BASE_PATH/../$BUILD_DIR/package/base-files/files/etc/uci-defaults"
-    local f="$dir/99-argon-default-theme"
+    local f="$dir/99-vantage-default-theme"
     mkdir -p "$dir" || return 0
     cat >"$f" <<'EOF'
 #!/bin/sh
-# 首次开机设置默认界面主题为 Argon
-[ -d /www/luci-static/argon ] || exit 0
-uci -q set luci.main.mediaurlbase='/luci-static/argon'
+# 首次开机设置默认界面主题为 Vantage
+[ -d /www/luci-static/vantage ] || exit 0
+uci -q set luci.main.mediaurlbase='/luci-static/vantage'
 uci -q commit luci
 exit 0
 EOF
-    chmod +x "$f" && echo "已注入默认主题脚本：/etc/uci-defaults/99-argon-default-theme"
+    chmod +x "$f" && echo "已注入默认主题脚本：/etc/uci-defaults/99-vantage-default-theme"
 }
 
 patch_rust_llvm() {
